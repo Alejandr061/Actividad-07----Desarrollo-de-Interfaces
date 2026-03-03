@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Ayuda - SaludSync Pro</title>
+    <style>
+        :root {
+            --primary: #005f73;
+            --secondary: #0a9396;
+            --bg-color: #f4f7f6;
+            --sidebar-bg: #ffffff;
+            --text-main: #333333;
+            --text-muted: #666666;
+            --border: #e0e0e0;
+        }
+
+        body {
+            margin: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px 30px;
+            background-color: white;
+            border-bottom: 1px solid var(--border);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+            z-index: 10;
+        }
+
+        .logo { font-size: 1.4rem; font-weight: 700; color: var(--primary); }
+        
+        .search-bar input {
+            padding: 10px 20px;
+            border: 1px solid var(--border);
+            border-radius: 20px;
+            width: 350px;
+            font-size: 0.9rem;
+            outline: none;
+            transition: all 0.3s ease;
+        }
+        .search-bar input:focus { 
+            border-color: var(--primary);
+            box-shadow: 0 0 8px rgba(0, 95, 115, 0.2);
+            width: 400px;
+        }
+
+        .nav-links span {
+            margin-left: 20px;
+            font-weight: 500;
+            color: var(--text-muted);
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .nav-links span:hover { color: var(--primary); }
+
+        .container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+        }
+
+        aside {
+            width: 270px;
+            background-color: var(--sidebar-bg);
+            border-right: 1px solid var(--border);
+            padding: 25px 20px;
+            overflow-y: auto;
+        }
+
+        aside ul { list-style: none; padding: 0; margin: 0; }
+        aside li {
+            padding: 10px 15px;
+            margin-bottom: 5px;
+            border-radius: 6px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            transition: all 0.2s;
+        }
+        aside li:hover { background-color: #f0f4f8; color: var(--primary); }
+        aside li.active { background-color: #e6f0f2; color: var(--primary); font-weight: 600; }
+
+        main {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .content-box {
+            background: white;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+            flex: 1;
+            animation: fadeIn 0.4s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 { margin-top: 0; color: var(--primary); font-size: 1.8rem;}
+        h2 { color: var(--secondary); font-size: 1.3rem; margin-top: 30px; border-bottom: 1px solid var(--border); padding-bottom: 10px;}
+        p, li { line-height: 1.6; }
+
+        .home-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .card {
+            border: 1px solid var(--border);
+            padding: 25px;
+            border-radius: 8px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .card:hover { transform: translateY(-3px); box-shadow: 0 4px 8px rgba(0,0,0,0.1); border-color: var(--secondary); }
+        .card h3 { margin: 10px 0 5px 0; color: var(--primary); font-size: 1.1rem;}
+        
+        .step-list { padding-left: 20px; }
+        .step-list li { margin-bottom: 15px; }
+        
+        .alert-box {
+            background-color: #fff3cd;
+            border-left: 4px solid #ffc107;
+            padding: 15px 20px;
+            margin: 20px 0;
+            border-radius: 0 4px 4px 0;
+        }
+
+        .index-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 20px;
+        }
+        .index-letter { font-size: 1.5rem; color: var(--secondary); font-weight: bold; border-bottom: 2px solid var(--border); margin-bottom: 10px; }
+        .index-grid ul { list-style: none; padding: 0; }
+        .index-grid li { color: var(--primary); cursor: pointer; text-decoration: underline; margin-bottom: 8px; }
+        .index-grid li:hover { color: var(--secondary); }
+
+        .contact-form { max-width: 500px; display: flex; flex-direction: column; gap: 15px; }
+        .contact-form input, .contact-form textarea {
+            width: 100%; padding: 12px; border: 1px solid var(--border); border-radius: 6px; font-family: inherit; transition: border 0.3s;
+        }
+        .contact-form input:focus, .contact-form textarea:focus { border-color: var(--secondary); outline: none; }
+        .contact-form textarea { resize: vertical; min-height: 120px; }
+
+        .form-group { margin-bottom: 20px; display: flex; flex-direction: column; }
+        .form-group label { margin-bottom: 8px; font-weight: 500; font-size: 0.95rem; }
+        .form-group input[type="text"] { padding: 10px; border: 1px solid var(--border); border-radius: 6px; width: 100%; max-width: 400px; }
+        
+        .toggle-row {
+            display: flex; justify-content: space-between; align-items: center;
+            padding: 15px 0; border-bottom: 1px solid #f0f0f0; max-width: 500px;
+        }
+        
+        .switch { position: relative; display: inline-block; width: 50px; height: 26px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider {
+            position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0;
+            background-color: #ccc; transition: .4s; border-radius: 34px;
+        }
+        .slider:before {
+            position: absolute; content: ""; height: 18px; width: 18px; left: 4px; bottom: 4px;
+            background-color: white; transition: .4s; border-radius: 50%;
+        }
+        input:checked + .slider { background-color: var(--secondary); }
+        input:checked + .slider:before { transform: translateX(24px); }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid var(--border);
+        }
+        button {
+            padding: 10px 24px;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        button:hover:not(:disabled) { background-color: var(--secondary); }
+        button:disabled { background-color: #cccccc; cursor: not-allowed; }
+        
+        .save-btn { margin-top: 20px; background-color: #28a745; width: 100%; max-width: 500px; font-size: 1.1rem; padding: 12px; }
+        .save-btn:hover { background-color: #218838; }
+
+    </style>
+</head>
+<body>
+
+    <header>
+        <div class="logo">SaludSync Pro</div>
+        <div class="search-bar">
+            <input type="text" id="buscador" placeholder="Buscar ayuda sobre instalaciones, citas..." oninput="ejecutarBusqueda()">
+        </div>
+        <div class="nav-links">
+            <span onclick="loadScreen(0)">Inicio</span>
+            <span onclick="loadScreen(4)">Índice</span>
+            <span onclick="loadScreen(5)">Contacto</span>
+        </div>
+    </header>
+
+    <div class="container">
+        <aside>
+            <ul id="menu">
+                <li onclick="loadScreen(0)">1. Página de Inicio</li>
+                <li onclick="loadScreen(1)">2. Procedimiento: Instalación</li>
+                <li onclick="loadScreen(2)">3. Problema: Dependencias</li>
+                <li onclick="loadScreen(3)">4. Configuración del Entorno</li>
+                <li onclick="loadScreen(4)">5. Índice Alfabético</li>
+                <li onclick="loadScreen(5)">6. Soporte Técnico</li>
+            </ul>
+        </aside>
+
+        <main>
+            <div class="content-box" id="content-area">
+                </div>
+            
+            <div class="nav-buttons">
+                <button id="btn-prev" onclick="navigate(-1)">&#8592; Anterior</button>
+                <button id="btn-next" onclick="navigate(1)">Siguiente &#8594;</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        const screens = [
+            `
+            <h1>¿En qué te podemos ayudar hoy?</h1>
+            <p>Bienvenido al centro de soporte de SaludSync Pro. Encuentra manuales de usuario y guías técnicas de despliegue.</p>
+            <div class="home-grid">
+                <div class="card" onclick="loadScreen(1)">
+                    <h3>📦 Guía de Instalación</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Despliegue en Windows (MSI/EXE) y Linux.</p>
+                </div>
+                <div class="card" onclick="loadScreen(2)">
+                    <h3>⚠️ Solución de Errores</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Problemas frecuentes y dependencias dpkg.</p>
+                </div>
+                <div class="card" onclick="loadScreen(3)">
+                    <h3>⚙️ Parametrización</h3>
+                    <p style="font-size: 0.9rem; color: #666;">Ajustes del entorno y servidor.</p>
+                </div>
+            </div>
+            `,
+            `
+            <h1>Instalación en Windows</h1>
+            <p>Siga estos pasos para desplegar el software en entornos locales mediante el instalador de Windows.</p>
+            <h2>Procedimiento paso a paso:</h2>
+            <ol class="step-list">
+                <li><strong>Descargue el paquete MSI:</strong> Acceda al portal y descargue el paquete de instalación.</li>
+                <li><strong>Ejecute como Administrador:</strong> Haga doble clic en el archivo descargado (MSI o EXE).</li>
+                <li><strong>Acepte los términos:</strong> Lea y valide la política de privacidad de datos.</li>
+                <li><strong>Seleccione la ruta:</strong> Deje la ruta por defecto para evitar errores.</li>
+                <li><strong>Finalice la instalación:</strong> Haga clic en "Finalizar" e inicie sesión.</li>
+            </ol>
+            <div class="alert-box">
+                <strong>Nota Técnica:</strong> El instalador contiene un "Software Bundle" que ubicará automáticamente todas las bibliotecas necesarias.
+            </div>
+            `,
+            `
+            <h1>Error Frecuente: Faltan dependencias (Linux)</h1>
+            <p>Ocurre cuando el gestor de paquetes no encuentra una biblioteca al instalar el .DEB.</p>
+            <div class="alert-box" style="border-left-color: #dc3545; background-color: #f8d7da; color: #721c24;">
+                <strong>Código de error:</strong> dpkg: error processing package saludsync-pro: dependency problems.
+            </div>
+            <h2>Solución:</h2>
+            <ol class="step-list">
+                <li>Abra su terminal (Ctrl + Alt + T).</li>
+                <li>Escriba el comando: <code>sudo apt-get install -f</code> y presione Enter.</li>
+                <li>El gestor descargará las bibliotecas faltantes automáticamente.</li>
+            </ol>
+            `,
+            `
+            <h1>Configuración del Entorno</h1>
+            <p>Ajustes avanzados para la instalación parametrizada.</p>
+            <h2>Arquitectura Cliente-Servidor</h2>
+            <div class="form-group">
+                <label>Dirección IP del Servidor Central:</label>
+                <input type="text" value="192.168.1.150">
+            </div>
+            <h2>Gestión del Sistema</h2>
+            <div class="toggle-row">
+                <div><strong>Resolver dependencias automáticamente</strong></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <div class="toggle-row">
+                <div><strong>Actualizaciones en segundo plano</strong></div>
+                <label class="switch"><input type="checkbox" checked><span class="slider"></span></label>
+            </div>
+            <button class="save-btn" onclick="alert('¡Configuración guardada con éxito!')">💾 Guardar Configuración</button>
+            `,
+            `
+            <h1>Índice Alfabético</h1>
+            <p>Encuentra rápidamente el término técnico o clínico que buscas.</p>
+            <div class="index-grid">
+                <div>
+                    <div class="index-letter">A - D</div>
+                    <ul>
+                        <li onclick="loadScreen(3)">Actualizaciones de seguridad</li>
+                        <li onclick="loadScreen(3)">Arquitectura Cliente-Servidor</li>
+                        <li onclick="loadScreen(2)">Dependencias (Error dpkg)</li>
+                        <li onclick="loadScreen(2)">DEB (Paquetes Linux)</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="index-letter">E - P</div>
+                    <ul>
+                        <li onclick="loadScreen(1)">EXE (Instalador Windows)</li>
+                        <li onclick="loadScreen(1)">Instalación parametrizada</li>
+                        <li onclick="loadScreen(1)">MSI (Windows Installer)</li>
+                        <li onclick="loadScreen(0)">Portal de inicio</li>
+                    </ul>
+                </div>
+                <div>
+                    <div class="index-letter">R - S</div>
+                    <ul>
+                        <li onclick="loadScreen(3)">Resolver dependencias</li>
+                        <li onclick="loadScreen(1)">Software Bundle</li>
+                        <li onclick="loadScreen(5)">Soporte Técnico (Contacto)</li>
+                    </ul>
+                </div>
+            </div>
+            `,
+            `
+            <h1>Soporte Técnico Especializado</h1>
+            <p>¿No encuentras la solución en la guía? Abre un ticket de soporte y nuestro equipo de Nivel 2 te responderá en menos de 24 horas.</p>
+            <div class="contact-form">
+                <div>
+                    <label style="font-weight: 500; font-size: 0.9rem;">Nombre del Administrador</label>
+                    <input type="text" placeholder="Ej: Dr. García o Informática Centro">
+                </div>
+                <div>
+                    <label style="font-weight: 500; font-size: 0.9rem;">Correo de la Clínica</label>
+                    <input type="email" placeholder="admin@clinica.com">
+                </div>
+                <div>
+                    <label style="font-weight: 500; font-size: 0.9rem;">Descripción del Problema</label>
+                    <textarea placeholder="Describe el error de instalación, la versión de Windows/Linux o el código de error exacto..."></textarea>
+                </div>
+                <button class="save-btn" style="background-color: var(--primary);" onclick="enviarMensaje()">✉️ Enviar Ticket de Soporte</button>
+            </div>
+            `
+        ];
+
+        let currentStep = 0;
+
+        function loadScreen(index) {
+            currentStep = index;
+            document.getElementById('buscador').value = '';
+            
+            document.getElementById('content-area').innerHTML = screens[currentStep];
+            
+            const menuItems = document.querySelectorAll('#menu li');
+            menuItems.forEach((item, i) => {
+                item.classList.remove('active');
+                if(i === currentStep) item.classList.add('active');
+            });
+
+            document.getElementById('btn-prev').disabled = (currentStep === 0);
+            document.getElementById('btn-next').disabled = (currentStep === screens.length - 1);
+            
+            document.querySelector('.nav-buttons').style.display = 'flex';
+        }
+
+        function navigate(direction) {
+            let newStep = currentStep + direction;
+            if (newStep >= 0 && newStep < screens.length) {
+                loadScreen(newStep);
+            }
+        }
+
+        function ejecutarBusqueda() {
+            const query = document.getElementById('buscador').value.toLowerCase();
+            
+            if(query.trim() === '') {
+                loadScreen(currentStep);
+                return;
+            }
+
+            let resultados = `<h1>🔍 Resultados para: "${query}"</h1><div class="home-grid">`;
+            let hayResultados = false;
+
+            screens.forEach((pantalla, index) => {
+                let textoLimpio = pantalla.replace(/<[^>]*>?/gm, '').toLowerCase();
+                
+                let matchTitulo = pantalla.match(/<h1>(.*?)<\/h1>/);
+                let titulo = matchTitulo ? matchTitulo[1] : `Sección ${index + 1}`;
+
+                if (textoLimpio.includes(query)) {
+                    resultados += `
+                    <div class="card" style="border-color: var(--primary);" onclick="loadScreen(${index})">
+                        <h3>Ir a: ${titulo}</h3>
+                        <p style="font-size: 0.9rem; color: #666;">Haz clic para ver la solución.</p>
+                    </div>`;
+                    hayResultados = true;
+                }
+            });
+
+            resultados += `</div>`;
+
+            if(!hayResultados) {
+                resultados = `
+                <h1>🔍 Sin resultados</h1>
+                <p>No hemos encontrado nada relacionado con "<b>${query}</b>".</p>
+                <div class="alert-box">💡 <strong>Prueba buscando:</strong> Instalación, Windows, Linux, Error, Configuración o Contacto.</div>`;
+            }
+
+            document.getElementById('content-area').innerHTML = resultados;
+            
+            document.querySelector('.nav-buttons').style.display = 'none';
+            
+            document.querySelectorAll('#menu li').forEach(item => item.classList.remove('active'));
+        }
+
+        function enviarMensaje() {
+            alert('¡Ticket enviado con éxito! 🚀\n\nEl equipo de soporte de SaludSync Pro se pondrá en contacto contigo muy pronto.');
+            loadScreen(0);
+        }
+
+        window.onload = () => loadScreen(0);
+    </script>
+</body>
+</html> 
